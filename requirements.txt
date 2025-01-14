@@ -8,3 +8,4 @@ PyYAML
 ulid-py
 pytest-cov
 httpx
+motor
