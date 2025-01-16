@@ -1,6 +1,7 @@
 fastApi
 uvicorn
 pydantic
+pydantic[email]
 pytest
 python-dotenv
 pylint
@@ -9,3 +10,4 @@ ulid-py
 pytest-cov
 httpx
 motor
+requests
