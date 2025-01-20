@@ -1,40 +1,36 @@
 import logging
-import os
 
-import requests
 from dotenv import load_dotenv
 from requests import RequestException
 
-from models.order import Customer, Order, Product
+from clients.customer_client import CustomerClient
+from clients.product_client import ProductClient
+from models.order import Order
 from models.order_request import OrderRequest
 from storages.order_storage import OrderStorage
 
 
 class OrderService:
-    def __init__(self, storage: OrderStorage):
+    def __init__(
+        self, storage: OrderStorage, customer: CustomerClient, product: ProductClient
+    ):
         self.logger = logging.getLogger(__name__)
         self.storage = storage
+        self.customer = customer
+        self.product = product
         load_dotenv()
 
     def create_order(self, orderRequest: OrderRequest):
         try:
             self.logger.info("Creating order...")
 
-            customer_url = f"{os.getenv('CUSTOMER_BASE_URL')}{os.getenv('CUSTOMER_GET_BY_EMAIL_PATH')}{orderRequest.customer_email}"
-            customer_response = requests.get(customer_url).json()
-            self.logger.debug(f"Customer response: {customer_response}")
-
-            customer = Customer(**customer_response)
+            customer = self.customer.get_customer_by_email(orderRequest)
 
             products_data = []
             for product in orderRequest.products:
-                product_url = f"{os.getenv('PRODUCT_BASE_URL')}{os.getenv('PRODUCT_GET_BY_NAME_PATH')}{product.name}"
-
-                product_response = requests.get(product_url).json()
-                product = Product(**product_response)
+                product = self.product.get_product_by_name(product.name)
 
                 products_data.append(product)
-                self.logger.debug(f"Product data: {products_data}")
 
             order = Order(customer=customer, products=products_data)
 
