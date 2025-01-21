@@ -26,7 +26,9 @@ def create_order(order: OrderRequest, service: ServiceDep):
         logger.info("Started CreateOrder")
         order_id = service.create_order(order)
 
-        return OrderResponse(id=str(order_id))
+        logger.info(f"CreateOrder route order_id: {order_id}")
+
+        return OrderResponse(id=order_id)
 
     except ValueError as e:
         raise HTTPException(

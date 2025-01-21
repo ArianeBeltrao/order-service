@@ -1,8 +1,5 @@
 import logging
 
-from dotenv import load_dotenv
-from requests import RequestException
-
 from clients.customer_client import CustomerClient
 from clients.product_client import ProductClient
 from models.order import Order
@@ -18,13 +15,12 @@ class OrderService:
         self.storage = storage
         self.customer = customer
         self.product = product
-        load_dotenv()
 
-    def create_order(self, orderRequest: OrderRequest):
+    def create_order(self, orderRequest: OrderRequest) -> str:
         try:
             self.logger.info("Creating order...")
 
-            customer = self.customer.get_customer_by_email(orderRequest)
+            customer = self.customer.get_customer_by_email(orderRequest.customer_email)
 
             products_data = []
             for product in orderRequest.products:
@@ -36,11 +32,6 @@ class OrderService:
 
             return self.storage.create_order(order)
 
-        except RequestException as e:
-            self.logger.error(
-                f"Failed to create order and get customer email and products: {e}"
-            )
-            raise
         except Exception as e:
             self.logger.error(f"Failed to create order: {e}")
             raise
