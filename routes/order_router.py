@@ -4,6 +4,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from requests.exceptions import HTTPError
 
+from models.order import Orders
 from models.order_request import OrderRequest, OrderResponse
 from services.order_service import OrderService
 
@@ -36,3 +37,13 @@ def create_order(order: OrderRequest, service: ServiceDep):
             status_code=e.response.status_code,
             detail=str(e),
         ) from e
+
+
+@router.get("/v1/orders/customer/{customer_id}", response_model=Orders)
+def get_orders_by_customer_id(customer_id: str, service: ServiceDep):
+    logger.info(f"Started GetOrders with customer id={customer_id}")
+    orders_data = service.get_orders_by_customer_id(customer_id)
+
+    logger.info(f"GetOrders request finished with response={orders_data}")
+
+    return orders_data

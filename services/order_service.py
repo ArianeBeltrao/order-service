@@ -2,7 +2,7 @@ import logging
 
 from clients.customer_client import CustomerClient
 from clients.product_client import ProductClient
-from models.order import Order
+from models.order import Order, Orders
 from models.order_request import OrderRequest
 from storages.order_storage import OrderStorage
 
@@ -31,6 +31,16 @@ class OrderService:
             order = Order(customer=customer, products=products_data)
 
             return self.storage.create_order(order)
+
+        except Exception as e:
+            self.logger.error(f"Failed to create order: {e}")
+            raise
+
+    def get_orders_by_customer_id(self, customer_id: str) -> Orders:
+        try:
+            self.logger.info("Getting orders by customer id...")
+
+            return self.storage.get_orders_by_customer_id(customer_id)
 
         except Exception as e:
             self.logger.error(f"Failed to create order: {e}")
