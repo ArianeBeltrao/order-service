@@ -1,7 +1,9 @@
 from unittest.mock import MagicMock
 
+import requests
 from fastapi.testclient import TestClient
 from pytest import fixture
+from requests.exceptions import HTTPError
 
 from main import app
 from routes.order_router import get_order_service
@@ -40,7 +42,10 @@ def test_router_create_order(
 def test_router_create_order_value_error(
     service, client, order_request, order_request_json
 ):
-    service.create_order.side_effect = ValueError()
+    error_response = requests.Response()
+    error_response.status_code = 404
+
+    service.create_order.side_effect = HTTPError(response=error_response)
     response = client.post("/v1/orders", json=order_request_json)
 
     assert response.status_code == 404

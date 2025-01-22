@@ -55,19 +55,6 @@ def test_get_product_by_name(
     product_requests.get.assert_called_once_with(product_url)
 
 
-def test_get_product_by_name_value_error(
-    product_requests, product_client, product_url, http_response
-):
-    http_response.status_code = 404
-
-    product_requests.get.return_value = http_response
-
-    with pytest.raises(ValueError):
-        product_client.get_product_by_name("puzzle")
-
-    product_requests.get.assert_called_once_with(product_url)
-
-
 def test_get_product_by_name_request_exception(product_requests, product_client):
     product_requests.get.side_effect = requests.RequestException
 

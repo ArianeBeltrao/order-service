@@ -14,18 +14,14 @@ class CustomerClient:
     def get_customer_by_email(self, customer_email: str):
         try:
             self.logger.info(f"Getting customer by email={customer_email}")
-
             customer_url = f"{os.getenv('CUSTOMER_BASE_URL')}{os.getenv('CUSTOMER_GET_BY_EMAIL_PATH')}{customer_email}"
-            customer_response = self.requests.get(customer_url)
 
+            customer_response = self.requests.get(customer_url)
             self.logger.debug(f"Get customer by email response: {customer_response}")
 
-            if customer_response.status_code == 404:
-                raise ValueError(f"Customer not found with email={customer_email}")
+            customer_response.raise_for_status()
 
-            customer = Customer(**customer_response.json())
-
-            return customer
+            return Customer(**customer_response.json())
 
         except requests.RequestException as e:
             self.logger.error(f"Failed to get customer by email: {e}")

@@ -2,6 +2,7 @@ import logging
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from requests.exceptions import HTTPError
 
 from models.order_request import OrderRequest, OrderResponse
 from services.order_service import OrderService
@@ -30,8 +31,8 @@ def create_order(order: OrderRequest, service: ServiceDep):
 
         return OrderResponse(id=order_id)
 
-    except ValueError as e:
+    except HTTPError as e:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=e.response.status_code,
             detail=str(e),
         ) from e

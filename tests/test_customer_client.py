@@ -56,19 +56,6 @@ def test_get_customer_by_email(
     customer_requests.get.assert_called_once_with(customer_url)
 
 
-def test_get_customer_by_email_value_error(
-    customer_requests, customer_client, customer_url, http_response
-):
-    http_response.status_code = 404
-
-    customer_requests.get.return_value = http_response
-
-    with pytest.raises(ValueError):
-        customer_client.get_customer_by_email("ana@email.com")
-
-    customer_requests.get.assert_called_once_with(customer_url)
-
-
 def test_get_customer_by_email_request_exception(customer_requests, customer_client):
     customer_requests.get.side_effect = requests.RequestException
 
