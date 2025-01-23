@@ -34,13 +34,11 @@ def test_create_order(storage, order, order_id, db_collection):
     db_collection.insert_one.assert_called_once_with(order.model_dump())
 
 
-def test_create_order_pymongo_error(storage, order, db_collection, db_conn):
+def test_create_order_pymongo_error(storage, order, db_collection):
     db_collection.insert_one.side_effect = PyMongoError()
 
     with pytest.raises(PyMongoError):
         storage.create_order(order)
-
-    db_conn.rollback.assert_called_once()
 
 
 def test_get_orders_by_customer_id(
@@ -53,12 +51,8 @@ def test_get_orders_by_customer_id(
     assert result == orders
 
 
-def test_get_orders_by_customer_id_pymongo_error(
-    db_collection, storage, customer_id, db_conn
-):
+def test_get_orders_by_customer_id_pymongo_error(db_collection, storage, customer_id):
     db_collection.find.side_effect = PyMongoError()
 
     with pytest.raises(PyMongoError):
         storage.get_orders_by_customer_id(customer_id)
-
-    db_conn.rollback.assert_called_once()

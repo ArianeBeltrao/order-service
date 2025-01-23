@@ -7,11 +7,11 @@ from models.order import Customer
 
 
 class CustomerClient:
-    def __init__(self, client_http):
+    def __init__(self, client_http: httpx):
         self.logger = logging.getLogger(__name__)
         self.client_http = client_http
 
-    def get_customer_by_email(self, customer_email: str):
+    def get_customer_by_email(self, customer_email: str) -> Customer:
         try:
             self.logger.info(f"Getting customer by email={customer_email}")
             customer_url = f"{os.getenv('CUSTOMER_BASE_URL')}{os.getenv('CUSTOMER_GET_BY_EMAIL_PATH')}{customer_email}"

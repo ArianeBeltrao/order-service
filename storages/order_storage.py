@@ -1,15 +1,16 @@
 import logging
 
+from pymongo import MongoClient, database
 from pymongo.errors import PyMongoError
 
 from models.order import Order, Orders
 
 
 class OrderStorage:
-    def __init__(self, db_connection):
+    def __init__(self, db_connection: MongoClient):
         self.logger = logging.getLogger(__name__)
-        self.db_connection = db_connection
-        self.collection = self.db_connection.get_collection("order")
+        self.db_connection: MongoClient = db_connection
+        self.collection: database.Database = self.db_connection.get_collection("order")
 
     def create_order(self, order: Order) -> str:
         try:
@@ -20,7 +21,6 @@ class OrderStorage:
 
         except PyMongoError as e:
             self.logger.error(f"Failed to create order in DB. PyMongoError: {e}")
-            self.db_connection.rollback()
             raise
 
     def get_orders_by_customer_id(self, customer_id: str) -> Orders:
@@ -36,5 +36,4 @@ class OrderStorage:
             self.logger.error(
                 f"Failed to find orders in DB by customer id. PyMongoError: {e}"
             )
-            self.db_connection.rollback()
             raise

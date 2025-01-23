@@ -7,11 +7,11 @@ from models.order import Product
 
 
 class ProductClient:
-    def __init__(self, client_http):
+    def __init__(self, client_http: httpx):
         self.logger = logging.getLogger(__name__)
         self.client_http = client_http
 
-    def get_product_by_name(self, product_name: str):
+    def get_product_by_name(self, product_name: str) -> Product:
         try:
             self.logger.info(f"Getting product by name={product_name}")
             product_url = f"{os.getenv('PRODUCT_BASE_URL')}{os.getenv('PRODUCT_GET_BY_NAME_PATH')}{product_name}"

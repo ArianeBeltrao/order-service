@@ -28,8 +28,7 @@ def create_order(order: OrderRequest, service: ServiceDep):
         logger.info("Started CreateOrder")
         order_id = service.create_order(order)
 
-        logger.info(f"CreateOrder route order_id: {order_id}")
-
+        logger.info(f"CreateOrder request finished with response: {order_id}")
         return OrderResponse(id=order_id)
 
     except httpx.HTTPStatusError as e:
@@ -42,9 +41,7 @@ def create_order(order: OrderRequest, service: ServiceDep):
 @router.get("/v1/orders/customer/{customer_id}", response_model=Orders)
 def get_orders_by_customer_id(customer_id: str, service: ServiceDep):
     logger.info(f"Started GetOrders with customer id={customer_id}")
-
     orders_data = service.get_orders_by_customer_id(customer_id)
 
     logger.info(f"GetOrders request finished with response={orders_data}")
-
     return orders_data
