@@ -37,11 +37,6 @@ class OrderService:
             raise
 
     def get_orders_by_customer_id(self, customer_id: str) -> Orders:
-        try:
-            self.logger.info("Getting orders by customer id...")
+        self.logger.info("Getting orders by customer id...")
 
-            return self.storage.get_orders_by_customer_id(customer_id)
-
-        except Exception as e:
-            self.logger.error(f"Failed to get orders by customer id: {e}")
-            raise
+        return self.storage.get_orders_by_customer_id(customer_id)
