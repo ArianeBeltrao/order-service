@@ -1,8 +1,8 @@
 import logging
 from typing import Annotated
 
+import httpx
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from requests.exceptions import HTTPError
 
 from models.order import Orders
 from models.order_request import OrderRequest, OrderResponse
@@ -32,7 +32,7 @@ def create_order(order: OrderRequest, service: ServiceDep):
 
         return OrderResponse(id=order_id)
 
-    except HTTPError as e:
+    except httpx.HTTPStatusError as e:
         raise HTTPException(
             status_code=e.response.status_code,
             detail=str(e),

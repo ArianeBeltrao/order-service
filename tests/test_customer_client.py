@@ -1,8 +1,8 @@
 import os
 from unittest.mock import MagicMock
 
+import httpx
 import pytest
-import requests
 from pytest import fixture
 
 from clients.customer_client import CustomerClient
@@ -57,9 +57,11 @@ def test_get_customer_by_email(
 
 
 def test_get_customer_by_email_request_exception(customer_requests, customer_client):
-    customer_requests.get.side_effect = requests.RequestException
+    customer_requests.get.side_effect = httpx.RequestError(
+        "Failed to connect to customer service"
+    )
 
-    with pytest.raises(requests.RequestException):
+    with pytest.raises(httpx.RequestError):
         customer_client.get_customer_by_email("ana@email.com")
 
     customer_requests.get.assert_called_once()

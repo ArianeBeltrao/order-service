@@ -1,8 +1,8 @@
 import os
 from unittest.mock import MagicMock
 
+import httpx
 import pytest
-import requests
 from pytest import fixture
 
 from clients.product_client import ProductClient
@@ -56,9 +56,11 @@ def test_get_product_by_name(
 
 
 def test_get_product_by_name_request_exception(product_requests, product_client):
-    product_requests.get.side_effect = requests.RequestException
+    product_requests.get.side_effect = httpx.RequestError(
+        "Failed to connect to customer service"
+    )
 
-    with pytest.raises(requests.RequestException):
+    with pytest.raises(httpx.RequestError):
         product_client.get_product_by_name("puzzle")
 
     product_requests.get.assert_called_once()

@@ -1,7 +1,7 @@
 import logging
 from contextlib import asynccontextmanager
 
-import requests
+import httpx
 from fastapi import FastAPI
 
 from clients.customer_client import CustomerClient
@@ -20,8 +20,8 @@ async def lifespan(app: FastAPI):
     db_connection = get_database_connection()
     order_storage = OrderStorage(db_connection)
 
-    customer_client = CustomerClient(requests)
-    product_client = ProductClient(requests)
+    customer_client = CustomerClient(httpx)
+    product_client = ProductClient(httpx)
 
     order_service = OrderService(order_storage, customer_client, product_client)
 

@@ -43,5 +43,5 @@ class OrderService:
             return self.storage.get_orders_by_customer_id(customer_id)
 
         except Exception as e:
-            self.logger.error(f"Failed to create order: {e}")
+            self.logger.error(f"Failed to get orders by customer id: {e}")
             raise
