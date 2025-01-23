@@ -37,3 +37,17 @@ class OrderStorage:
                 f"Failed to find orders in DB by customer id. PyMongoError: {e}"
             )
             raise
+
+    def delete_order_by_id(self, order_id: str) -> None:
+        try:
+            result = self.collection.delete_one({"id": order_id})
+            self.logger.info(f"Deleting order in DB by order id: {result}")
+
+            if result.deleted_count == 0:
+                raise ValueError((f"Order not found with id {order_id}"))
+
+        except PyMongoError as e:
+            self.logger.error(
+                f"Failed to delete order in DB by order id. PyMongoError: {e}"
+            )
+            raise
