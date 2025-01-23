@@ -42,6 +42,7 @@ def create_order(order: OrderRequest, service: ServiceDep):
 @router.get("/v1/orders/customer/{customer_id}", response_model=Orders)
 def get_orders_by_customer_id(customer_id: str, service: ServiceDep):
     logger.info(f"Started GetOrders with customer id={customer_id}")
+
     orders_data = service.get_orders_by_customer_id(customer_id)
 
     logger.info(f"GetOrders request finished with response={orders_data}")

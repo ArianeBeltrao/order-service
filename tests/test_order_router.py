@@ -50,3 +50,14 @@ def test_router_create_order_value_error(
 
     assert response.status_code == 404
     service.create_order.assert_called_once_with(order_request)
+
+
+def test_router_get_orders_by_customer_id(
+    service, client, orders, orders_json, customer_id
+):
+    service.get_orders_by_customer_id.return_value = orders
+    response = client.get(f"/v1/orders/customer/{customer_id}")
+    assert response.status_code == 200
+    assert response.json() == orders_json
+
+    service.get_orders_by_customer_id.assert_called_once_with(customer_id)

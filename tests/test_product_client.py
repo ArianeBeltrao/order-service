@@ -34,7 +34,7 @@ def fixture_product_url():
 @fixture(name="product_json")
 def fixture_product_json():
     return {
-        "id": "01JH3ZNS5PFG3R1S17N0QX2P18",
+        "id": "01JH46Z7BRAJ1HYE4ADZS6JWJQ",
         "name": "puzzle",
         "description": "500 piece puzzle",
         "price": 10,

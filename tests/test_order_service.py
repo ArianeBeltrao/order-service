@@ -61,3 +61,23 @@ def test_create_order_handles_exception(
         service.create_order(order_request)
 
     storage.create_order.assert_called_once()
+
+
+def test_get_orders_by_customer_id_successfully(storage, orders, service, customer_id):
+    storage.get_orders_by_customer_id.return_value = orders
+
+    result = service.get_orders_by_customer_id(customer_id)
+
+    assert result == orders
+    storage.get_orders_by_customer_id.assert_called_once_with(customer_id)
+
+
+def test_get_orders_by_customer_id_handles_exception(service, storage):
+    storage.get_orders_by_customer_id.side_effect = Exception()
+
+    with pytest.raises(Exception):
+        service.get_orders_by_customer_id("0000000S5PFG3R1S17N0QX2P18")
+
+    storage.get_orders_by_customer_id.assert_called_once_with(
+        "0000000S5PFG3R1S17N0QX2P18"
+    )

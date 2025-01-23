@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pytest import fixture
 
-from models.order import Customer, Order, Product
+from models.order import Customer, Order, Orders, Product
 from models.order_request import OrderRequest
 
 
@@ -14,7 +14,7 @@ def fixture_customer():
 @fixture(name="product")
 def fixture_product():
     return Product(
-        id="01JH3ZNS5PFG3R1S17N0QX2P18",
+        id="01JH46Z7BRAJ1HYE4ADZS6JWJQ",
         name="puzzle",
         description="500 piece puzzle",
         price=10,
@@ -25,6 +25,11 @@ def fixture_product():
 @fixture(name="order_id")
 def fixture_order_id():
     return "678e64681e88dc843b618c67"
+
+
+@fixture(name="customer_id")
+def fixture_customer_id():
+    return "01JH3ZNS5PFG3R1S17N0QX2P18"
 
 
 @fixture(name="order_response_json")
@@ -62,3 +67,38 @@ def fixture_order(order_id, customer, product):
         created_at=datetime(2024, 12, 23, 15, 57, 25, 496623),
         updated_at=None,
     )
+
+
+@fixture(name="orders")
+def fixture_orders(order):
+    return Orders(orders=[order])
+
+
+@fixture(name="orders_dict")
+def fixture_orders_dict():
+    return [
+        {
+            "id": "678e64681e88dc843b618c67",
+            "customer": {
+                "id": "01JH3ZNS5PFG3R1S17N0QX2P18",
+                "name": "ana",
+                "email": "ana@email.com",
+            },
+            "products": [
+                {
+                    "id": "01JH46Z7BRAJ1HYE4ADZS6JWJQ",
+                    "name": "puzzle",
+                    "description": "500 piece puzzle",
+                    "price": 10.0,
+                    "quantity": 2,
+                }
+            ],
+            "created_at": "2024-12-23T15:57:25.496623",
+            "updated_at": None,
+        }
+    ]
+
+
+@fixture(name="orders_json")
+def fixture_orders_json(orders_dict):
+    return {"orders": orders_dict}
