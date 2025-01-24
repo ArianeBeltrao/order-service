@@ -56,3 +56,22 @@ def test_get_orders_by_customer_id_pymongo_error(db_collection, storage, custome
 
     with pytest.raises(PyMongoError):
         storage.get_orders_by_customer_id(customer_id)
+
+
+def test_delete_order_by_id(storage, order_id):
+    result = storage.delete_order_by_id(order_id)
+    assert result is None
+
+
+def test_delete_order_by_id_value_error(db_collection, storage, order_id):
+    db_collection.delete_one.return_value = MagicMock(deleted_count=0)
+
+    with pytest.raises(ValueError):
+        storage.delete_order_by_id(order_id)
+
+
+def test_delete_order_by_id_pymongo_error(db_collection, storage, order_id):
+    db_collection.delete_one.side_effect = PyMongoError()
+
+    with pytest.raises(PyMongoError):
+        storage.delete_order_by_id(order_id)

@@ -81,3 +81,20 @@ def test_get_orders_by_customer_id_handles_exception(service, storage):
     storage.get_orders_by_customer_id.assert_called_once_with(
         "0000000S5PFG3R1S17N0QX2P18"
     )
+
+
+def test_delete_order_by_id_successfully(storage, service, order_id):
+    storage.delete_order_by_id.return_value = None
+    result = service.delete_order_by_id(order_id)
+
+    assert result is None
+    storage.delete_order_by_id.assert_called_once_with(order_id)
+
+
+def test_delete_order_by_id_handles_value_error(storage, service, order_id):
+    storage.delete_order_by_id.side_effect = ValueError()
+
+    with pytest.raises(ValueError):
+        service.delete_order_by_id(order_id)
+
+    storage.delete_order_by_id.assert_called_once_with(order_id)

@@ -61,3 +61,19 @@ def test_router_get_orders_by_customer_id(
     assert response.json() == orders_json
 
     service.get_orders_by_customer_id.assert_called_once_with(customer_id)
+
+
+def test_router_delete_order_by_id(service, client, order_id):
+    service.delete_order_by_id.return_value = None
+    response = client.delete(f"/v1/orders/{order_id}")
+
+    assert response.status_code == 204
+    service.delete_order_by_id.assert_called_once_with(order_id)
+
+
+def test_router_delete_order_by_id_value_error(service, client, order_id):
+    service.delete_order_by_id.side_effect = ValueError()
+    response = client.delete(f"/v1/orders/{order_id}")
+
+    assert response.status_code == 404
+    service.delete_order_by_id.assert_called_once_with(order_id)
