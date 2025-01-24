@@ -13,9 +13,9 @@ class OrderStorage:
         self.collection: database.Database = self.db_connection.get_collection("order")
 
     def create_order(self, order: Order) -> str:
+        self.logger.info("Inserting order in DB")
         try:
             result = self.collection.insert_one(order.model_dump())
-            self.logger.info(f"Inserting order in DB with the order request: {order}")
 
             return str(result.inserted_id)
 
@@ -24,9 +24,9 @@ class OrderStorage:
             raise
 
     def get_orders_by_customer_id(self, customer_id: str) -> Orders:
+        self.logger.info("Finding orders in DB")
         try:
             result = self.collection.find({"customer.id": customer_id})
-            self.logger.info(f"Finding orders in DB by customer id: {result}")
 
             orders = [Order(**order) for order in result]
 
@@ -39,9 +39,9 @@ class OrderStorage:
             raise
 
     def delete_order_by_id(self, order_id: str) -> None:
+        self.logger.info("Deleting order in DB")
         try:
             result = self.collection.delete_one({"id": order_id})
-            self.logger.info(f"Deleting order in DB by order id: {result}")
 
             if result.deleted_count == 0:
                 raise ValueError((f"Order not found with id {order_id}"))
