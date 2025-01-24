@@ -1,0 +1,47 @@
+import logging
+from typing import Annotated
+
+import httpx
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+
+from models.order import Orders
+from models.order_request import OrderRequest, OrderResponse
+from services.order_service import OrderService
+
+router = APIRouter()
+
+logger = logging.getLogger(__name__)
+
+
+def get_order_service(request: Request):
+    return request.state.order_service
+
+
+ServiceDep = Annotated[OrderService, Depends(get_order_service)]
+
+
+@router.post(
+    "/v1/orders", status_code=status.HTTP_201_CREATED, response_model=OrderResponse
+)
+def create_order(order: OrderRequest, service: ServiceDep):
+    try:
+        logger.info("Started CreateOrder")
+        order_id = service.create_order(order)
+
+        logger.info(f"CreateOrder request finished with response: {order_id}")
+        return OrderResponse(id=order_id)
+
+    except httpx.HTTPStatusError as e:
+        raise HTTPException(
+            status_code=e.response.status_code,
+            detail=str(e),
+        ) from e
+
+
+@router.get("/v1/orders/customer/{customer_id}", response_model=Orders)
+def get_orders_by_customer_id(customer_id: str, service: ServiceDep):
+    logger.info(f"Started GetOrders with customer id={customer_id}")
+    orders_data = service.get_orders_by_customer_id(customer_id)
+
+    logger.info(f"GetOrders request finished with response={orders_data}")
+    return orders_data
