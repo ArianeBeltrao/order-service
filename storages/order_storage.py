@@ -7,10 +7,23 @@ from models.order import Order, Orders
 
 
 class OrderStorage:
-    def __init__(self, db_connection: MongoClient):
+    def __init__(self, db_connection: MongoClient, async_db_connection):
         self.logger = logging.getLogger(__name__)
         self.db_connection: MongoClient = db_connection
         self.collection: database.Database = self.db_connection.get_collection("order")
+        self.async_db_conn = async_db_connection
+        self.async_collection = self.async_db_conn["order"]
+
+    async def v2_create_order(self, order: Order) -> str:
+        self.logger.info("V2 Inserting order in DB")
+        try:
+            result = await self.async_collection.insert_one(order.model_dump())
+
+            return str(result.inserted_id)
+
+        except PyMongoError as e:
+            self.logger.error(f"Failed to create order in DB. PyMongoError: {e}")
+            raise
 
     def create_order(self, order: Order) -> str:
         self.logger.info("Inserting order in DB")

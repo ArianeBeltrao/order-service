@@ -16,6 +16,28 @@ class OrderService:
         self.customer = customer
         self.product = product
 
+    async def v2_create_order(self, orderRequest: OrderRequest) -> str:
+        try:
+            self.logger.info("V2 Creating order...")
+
+            customer = await self.customer.v2_get_customer_by_email(
+                orderRequest.customer_email
+            )
+
+            products_data = []
+            for product in orderRequest.products:
+                product = await self.product.v2_get_product_by_name(product.name)
+
+                products_data.append(product)
+
+            order = Order(customer=customer, products=products_data)
+
+            return await self.storage.v2_create_order(order)
+
+        except Exception as e:
+            self.logger.error(f"Failed to create order: {e}")
+            raise
+
     def create_order(self, orderRequest: OrderRequest) -> str:
         try:
             self.logger.info("Creating order...")

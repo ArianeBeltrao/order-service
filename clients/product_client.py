@@ -11,6 +11,25 @@ class ProductClient:
         self.logger = logging.getLogger(__name__)
         self.client_http = client_http
 
+    async def v2_get_product_by_name(self, product_name: str) -> Product:
+        try:
+            self.logger.info(f"V2 Getting product by name={product_name}")
+            product_url = f"{os.getenv('PRODUCT_BASE_URL')}{os.getenv('PRODUCT_GET_BY_NAME_PATH')}{product_name}"
+
+            async with httpx.AsyncClient() as client:
+                product_response = await client.get(product_url)
+                self.logger.debug(
+                    f"V2 Get product by name response: {product_response}"
+                )
+
+                product_response.raise_for_status()
+
+                return Product(**product_response.json())
+
+        except httpx.RequestError as e:
+            self.logger.error(f"Failed to get product by name: {e}")
+            raise
+
     def get_product_by_name(self, product_name: str) -> Product:
         try:
             self.logger.info(f"Getting product by name={product_name}")
