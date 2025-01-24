@@ -40,3 +40,7 @@ class OrderService:
         self.logger.info("Getting orders by customer id...")
 
         return self.storage.get_orders_by_customer_id(customer_id)
+
+    def delete_order_by_id(self, order_id: str) -> None:
+        self.logger.info("Deleting order by id...")
+        self.storage.delete_order_by_id(order_id)

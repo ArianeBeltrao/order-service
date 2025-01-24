@@ -45,3 +45,18 @@ def get_orders_by_customer_id(customer_id: str, service: ServiceDep):
 
     logger.info(f"GetOrders request finished with response={orders_data}")
     return orders_data
+
+
+@router.delete("/v1/orders/{order_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_order_by_id(order_id: str, service: ServiceDep):
+    try:
+        logger.info(f"Started DeleteOrder with order id={order_id}")
+        service.delete_order_by_id(order_id)
+
+        logger.info(f"DeleteOrder request finished for order id={order_id}")
+        return
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Order not found with id {order_id}",
+        ) from e
