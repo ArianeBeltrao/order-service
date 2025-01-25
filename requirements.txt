@@ -12,3 +12,5 @@ httpx
 motor
 requests
 pymongo
+pytest-asyncio
+pytest_mock

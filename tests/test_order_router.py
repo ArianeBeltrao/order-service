@@ -1,6 +1,7 @@
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock
 
 import httpx
+import pytest
 from fastapi.testclient import TestClient
 from pytest import fixture
 
@@ -26,6 +27,36 @@ def fixture_client(service):
     return client
 
 
+@pytest.mark.asyncio
+async def test_router_v2_create_order(
+    service, client, order_id, order_request_json, order_response_json, order_request
+):
+    service.v2_create_order = AsyncMock(return_value=order_id)
+    response = client.post("/v2/orders", json=order_request_json)
+
+    assert response.status_code == 201
+    assert response.json() == order_response_json
+
+    service.v2_create_order.assert_called_once_with(order_request)
+
+
+@pytest.mark.asyncio
+async def test_router_v2_create_order_error(
+    service, client, order_request, order_request_json
+):
+    error_response = httpx.Response(status_code=404)
+
+    service.v2_create_order = AsyncMock(
+        side_effect=httpx.HTTPStatusError(
+            response=error_response, message="error", request=None
+        )
+    )
+    response = client.post("/v2/orders", json=order_request_json)
+
+    assert response.status_code == 404
+    service.v2_create_order.assert_called_once_with(order_request)
+
+
 def test_router_create_order(
     service, client, order_request, order_id, order_request_json, order_response_json
 ):
@@ -38,9 +69,7 @@ def test_router_create_order(
     service.create_order.assert_called_once_with(order_request)
 
 
-def test_router_create_order_value_error(
-    service, client, order_request, order_request_json
-):
+def test_router_create_order_error(service, client, order_request, order_request_json):
     error_response = httpx.Response(status_code=404)
 
     service.create_order.side_effect = httpx.HTTPStatusError(

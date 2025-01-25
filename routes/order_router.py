@@ -21,6 +21,24 @@ ServiceDep = Annotated[OrderService, Depends(get_order_service)]
 
 
 @router.post(
+    "/v2/orders", status_code=status.HTTP_201_CREATED, response_model=OrderResponse
+)
+async def v2_create_order(order: OrderRequest, service: ServiceDep):
+    try:
+        logger.info("V2 Started CreateOrder")
+        order_id = await service.v2_create_order(order)
+
+        logger.info(f"V2 CreateOrder request finished with response: {order_id}")
+        return OrderResponse(id=order_id)
+
+    except httpx.HTTPStatusError as e:
+        raise HTTPException(
+            status_code=e.response.status_code,
+            detail=str(e),
+        ) from e
+
+
+@router.post(
     "/v1/orders", status_code=status.HTTP_201_CREATED, response_model=OrderResponse
 )
 def create_order(order: OrderRequest, service: ServiceDep):
