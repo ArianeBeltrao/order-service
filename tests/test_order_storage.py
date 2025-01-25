@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from pymongo.errors import PyMongoError
@@ -19,9 +19,42 @@ def fixture_db_conn(db_collection):
     return db
 
 
+@fixture(name="async_db_conn")
+def fixture_async_db_conn(db_collection):
+    db = MagicMock()
+    db.return_value = db_collection
+    return db
+
+
 @fixture(name="storage")
-def fixture_storage(db_conn):
-    return OrderStorage(db_conn)
+def fixture_storage(db_conn, async_db_conn):
+    return OrderStorage(db_conn, async_db_conn)
+
+
+@pytest.mark.asyncio
+async def test_v2_create_order(storage, order, order_id, db_collection):
+    db_collection.insert_one = AsyncMock(return_value=MagicMock(inserted_id=order_id))
+
+    storage.async_collection = AsyncMock()
+    storage.async_collection.insert_one = AsyncMock(
+        return_value=MagicMock(inserted_id=order_id)
+    )
+
+    result = await storage.v2_create_order(order)
+
+    assert result == order_id
+
+    storage.async_collection.insert_one.assert_called_once_with(order.model_dump())
+
+
+@pytest.mark.asyncio
+async def test_v2_create_order_pymongo_error(storage, order, db_collection, order_id):
+    db_collection.insert_one = AsyncMock(side_effect=PyMongoError())
+
+    storage.async_collection = db_collection
+
+    with pytest.raises(PyMongoError):
+        await storage.v2_create_order(order)
 
 
 def test_create_order(storage, order, order_id, db_collection):

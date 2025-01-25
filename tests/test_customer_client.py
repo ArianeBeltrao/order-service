@@ -1,5 +1,5 @@
 import os
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import httpx
 import pytest
@@ -38,6 +38,34 @@ def fixture_customer_json():
     }
 
 
+@pytest.mark.asyncio
+async def test_v2_get_customer_by_email(
+    customer_client,
+    customer,
+    customer_json,
+    http_response,
+):
+    http_response.json.return_value = customer_json
+
+    http_response.raise_for_status = MagicMock()
+
+    with patch.object(httpx.AsyncClient, "get", return_value=http_response):
+        result = await customer_client.v2_get_customer_by_email("ana@email.com")
+
+        assert result == customer
+
+
+@pytest.mark.asyncio
+async def test_v2_get_customer_by_email_request_exception(customer_client):
+    with patch.object(
+        httpx.AsyncClient,
+        "get",
+        side_effect=httpx.HTTPError("Failed to get customer by email"),
+    ):
+        with pytest.raises(httpx.HTTPError):
+            await customer_client.v2_get_customer_by_email("ana@email.com")
+
+
 def test_get_customer_by_email(
     customer_requests,
     customer_client,
@@ -57,11 +85,11 @@ def test_get_customer_by_email(
 
 
 def test_get_customer_by_email_request_exception(customer_requests, customer_client):
-    customer_requests.get.side_effect = httpx.RequestError(
+    customer_requests.get.side_effect = httpx.HTTPError(
         "Failed to connect to customer service"
     )
 
-    with pytest.raises(httpx.RequestError):
+    with pytest.raises(httpx.HTTPError):
         customer_client.get_customer_by_email("ana@email.com")
 
     customer_requests.get.assert_called_once()

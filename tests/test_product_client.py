@@ -1,5 +1,5 @@
 import os
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import httpx
 import pytest
@@ -40,6 +40,34 @@ def fixture_product_json():
         "price": 10,
         "quantity": 2,
     }
+
+
+@pytest.mark.asyncio
+async def test_v2_get_product_by_name(
+    product_client,
+    product,
+    product_json,
+    http_response,
+):
+    http_response.json.return_value = product_json
+
+    http_response.raise_for_status = MagicMock()
+
+    with patch.object(httpx.AsyncClient, "get", return_value=http_response):
+        result = await product_client.v2_get_product_by_name("puzzle")
+
+        assert result == product
+
+
+@pytest.mark.asyncio
+async def test_v2_get_product_by_name_request_exception(product_client):
+    with patch.object(
+        httpx.AsyncClient,
+        "get",
+        side_effect=httpx.HTTPError("Failed to get product by name"),
+    ):
+        with pytest.raises(httpx.HTTPError):
+            await product_client.v2_get_product_by_name("puzzle")
 
 
 def test_get_product_by_name(

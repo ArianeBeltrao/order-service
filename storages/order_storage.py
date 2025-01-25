@@ -1,5 +1,6 @@
 import logging
 
+import motor.motor_asyncio
 from pymongo import MongoClient, database
 from pymongo.errors import PyMongoError
 
@@ -7,7 +8,11 @@ from models.order import Order, Orders
 
 
 class OrderStorage:
-    def __init__(self, db_connection: MongoClient, async_db_connection):
+    def __init__(
+        self,
+        db_connection: MongoClient,
+        async_db_connection: motor.motor_asyncio.AsyncIOMotorDatabase,
+    ):
         self.logger = logging.getLogger(__name__)
         self.db_connection: MongoClient = db_connection
         self.collection: database.Database = self.db_connection.get_collection("order")
